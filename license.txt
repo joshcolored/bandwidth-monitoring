@@ -1,0 +1,52 @@
+END USER LICENSE AGREEMENT (EULA)
+
+Bandwidth Monitoring Dashboard
+
+This End User License Agreement ("Agreement") is a legal agreement between you ("User") and [Krazene] ("Company") for the use of the Bandwidth Dashboard software ("Software").
+
+1. LICENSE GRANT
+
+The Company grants the User a non-exclusive, non-transferable, revocable license to install and use the Software solely for internal monitoring and operational purposes.
+
+2. RESTRICTIONS
+
+The User may NOT:
+
+Modify, reverse engineer, or decompile the Software
+
+Distribute, sell, sublicense, or rent the Software
+
+Use the Software for unlawful or unauthorized purposes
+
+3. OWNERSHIP
+
+The Software is licensed, not sold.
+All rights, title, and interest remain the exclusive property of [Krazene].
+
+4. DATA & THIRD-PARTY SERVICES
+
+The Software may display data from third-party services and web-based dashboards.
+The Company is not responsible for the availability, accuracy, or reliability of third-party content.
+
+5. DISCLAIMER OF WARRANTIES
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE COMPANY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING FROM THE USE OR INABILITY TO USE THE SOFTWARE.
+
+7. TERMINATION
+
+This Agreement is effective until terminated.
+The Company may terminate this license at any time if the User violates any terms of this Agreement.
+
+8. GOVERNING LAW
+
+This Agreement shall be governed by and construed in accordance with the laws of the Republic of the Philippines.
+
+9. ACCEPTANCE
+
+By installing or using the Software, the User acknowledges that they have read, understood, and agreed to be bound by the terms of this Agreement.
+
+© [2026] [Joshua Grijaldo (Krazene)]. All rights reserved.
