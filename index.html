@@ -1,479 +1,618 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
 
-    <style>
-      :root {
-        --bg: #0f172a;
-        --panel: #111827;
-        --card: #1f2937;
-        --border: #374151;
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --accent: #3b82f6;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
 
-      * {
-        box-sizing: border-box;
-      }
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #3b82f6;
+    }
 
-      body {
-        margin: 0;
-        height: 100vh;
-        background: var(--bg);
-        color: var(--text);
-        font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        display: flex;
-        flex-direction: column;
-      }
+    * {
+      box-sizing: border-box;
+    }
 
-      /* ===== TABS ===== */
-      .tabs {
-        display: flex;
-        background: linear-gradient(to right, #0b1220, #111827);
-        border-bottom: 1px solid var(--border);
-      }
+    body {
+      margin: 0;
+      height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
 
-      .tabs button {
-        flex: 1;
-        padding: 12px;
-        background: none;
-        border: none;
-        color: var(--muted);
-        cursor: pointer;
-        font-size: 14px;
-      }
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      background: linear-gradient(to right, #0b1220, #111827);
+      border-bottom: 1px solid var(--border);
+    }
 
-      .tabs button.active {
-        color: #fff;
-        font-weight: 600;
-        border-bottom: 2px solid var(--accent);
-      }
+    .tabs button {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-      /* ===== TAB ICON ===== */
-      .tab-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
+    .tabs button.active {
+      color: #fff;
+      font-weight: 600;
+      border-bottom: 2px solid var(--accent);
+    }
 
-      .tab-btn img {
-        width: 18px;
-        height: 18px;
-        object-fit: contain;
-        filter: grayscale(100%);
-        opacity: 0.8;
-      }
+    /* ===== TAB ICON ===== */
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-      .tabs button.active img {
-        filter: none;
-        opacity: 1;
-      }
+    .tab-btn img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      filter: grayscale(100%);
+      opacity: 0.8;
+    }
 
-      /* ===== VIEWS ===== */
-      .view {
-        display: none;
-        flex: 1;
-      }
+    .tabs button.active img {
+      filter: none;
+      opacity: 1;
+    }
 
-      .view.active {
-        display: flex;
-      }
+    /* ===== VIEWS ===== */
+    .view {
+      display: none;
+      flex: 1;
+    }
 
-      .single {
-        padding: 0;
-      }
+    .view.active {
+      display: flex;
+    }
 
-      .combined.active {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1px;
-      }
+    .single {
+      padding: 0;
+    }
 
-      /* ===== CLEAN SINGLE VIEW ===== */
-      .clean {
-        position: relative;
-        flex: 1;
-      }
+    .combined.active {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+    }
 
-      /* ===== ZOOM FLOATING CONTROLS ===== */
-      .zoom-controls {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 10;
-        display: flex;
-        gap: 4px;
-      }
+    /* ===== CLEAN SINGLE VIEW ===== */
+    .clean {
+      position: relative;
+      flex: 1;
+    }
 
-      .zoom-controls button {
-        background: rgba(0, 0, 0, 0.6);
-        border: 1px solid var(--border);
-        color: #fff;
-        font-size: 12px;
-        padding: 4px 8px;
-        border-radius: 4px;
-        cursor: pointer;
-      }
+    /* ===== ZOOM FLOATING CONTROLS ===== */
+    .zoom-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      display: flex;
+      gap: 4px;
+    }
 
-      .zoom-controls button:hover {
-        background: rgba(255, 255, 255, 0.15);
-      }
+    .zoom-controls button {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-      /* ===== COMBINED CARDS ===== */
-      .card {
-        background: var(--card);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
+    .zoom-controls button:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
 
-      .header {
-        padding: 6px 10px;
-        font-size: 13px;
-        font-weight: 600;
-        border-bottom: 1px solid var(--border);
-        background: rgba(0, 0, 0, 0.25);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+    /* ===== COMBINED CARDS ===== */
+    .card {
+      background: var(--card);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
 
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
+    .header {
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-      .header-left img {
-        width: 16px;
-        height: 16px;
-        object-fit: contain;
-      }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-      .body {
-        flex: 1;
-        position: relative;
-      }
+    .header-left img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
 
-      webview {
-        width: 100%;
-        height: 100%;
-      }
+    .body {
+      flex: 1;
+      position: relative;
+    }
 
-      /* ===== AUTO-HIDE SCROLLBAR ===== */
-      body.hide-scrollbar {
-        scrollbar-width: none; /* Firefox */
-      }
+    webview {
+      width: 100%;
+      height: 100%;
+    }
 
-      body.hide-scrollbar::-webkit-scrollbar {
-        width: 0;
-        height: 0;
-      }
+    /* ===== AUTO-HIDE SCROLLBAR ===== */
+    body.hide-scrollbar {
+      scrollbar-width: none;
+      /* Firefox */
+    }
 
-      /* Optional: when visible */
-      body::-webkit-scrollbar {
-        width: 8px;
-      }
+    body.hide-scrollbar::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
 
-      body::-webkit-scrollbar-track {
-        background: transparent;
-      }
+    .last-updated {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 12;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid var(--border);
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
 
-      body::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.25);
-        border-radius: 6px;
-      }
-    </style>
-  </head>
+    /* Optional: when visible */
+    body::-webkit-scrollbar {
+      width: 8px;
+    }
 
-  <body>
-    <!-- ===== TABS ===== -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="showTab(0)">
-        <img src="assets/pldt.png" alt="PLDT" />
-        <span>PLDT</span>
-      </button>
+    body::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-      <button class="tab-btn" onclick="showTab(1)">
-        <img src="assets/globe.png" alt="Globe" />
-        <span>GLOBE</span>
-      </button>
+    body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+    }
 
-      <button class="tab-btn" onclick="showTab(2)">
-        <img src="assets/eastern.png" alt="Eastern Telcom" />
-        <span>EASTERN TELECOM</span>
-      </button>
+    .zoom-controls .pldt-range-switch button.active {
+      background: var(--accent);
+    }
+  </style>
+</head>
 
-      <button class="tab-btn" onclick="showTab(3)">
-        <span>ALL BANDWIDTH</span>
-      </button>
+<body>
+  <!-- ===== TABS ===== -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab(0)">
+      <img src="assets/pldt.png" alt="PLDT" />
+      <span>PLDT</span>
+    </button>
+
+    <button class="tab-btn" onclick="showTab(1)">
+      <img src="assets/globe.png" alt="Globe" />
+      <span>GLOBE</span>
+    </button>
+
+    <button class="tab-btn" onclick="showTab(2)">
+      <img src="assets/eastern.png" alt="Eastern Telcom" />
+      <span>EASTERN TELECOM</span>
+    </button>
+
+    <button class="tab-btn" onclick="showTab(3)">
+      <span>ALL BANDWIDTH</span>
+    </button>
+  </div>
+
+  <!-- ===== TAB 1 ===== -->
+  <div class="view active single">
+    <div class="clean">
+      <div class="last-updated" id="updated-1"></div>
+      <div class="zoom-controls">
+        <div class="pldt-range-switch">
+          <button onclick="setPLDTRange('6h', this)">6H</button>
+          <button onclick="setPLDTRange('1d', this)">1D</button>
+          <button onclick="setPLDTRange('7d', this)" class="active">7D</button>
+          <button onclick="setPLDTRange('14d', this)">14D</button>
+          <button onclick="setPLDTRange('30d', this)">30D</button>
+        </div>
+
+        <button onclick="zoomIn(0)">+</button>
+        <button onclick="zoomOut(0)">−</button>
+        <button onclick="resetZoom(0)">⟳</button>
+      </div>
+      <div id="slot-1" style="height: 100%"></div>
     </div>
+  </div>
 
-    <!-- ===== TAB 1 ===== -->
-    <div class="view active single">
-      <div class="clean">
-        <div class="zoom-controls">
+  <!-- ===== TAB 2 ===== -->
+  <div class="view single">
+    <div class="clean">
+      <div class="last-updated" id="updated-2"></div>
+      <div class="zoom-controls">
+        <button onclick="zoomIn(1)">+</button>
+        <button onclick="zoomOut(1)">−</button>
+        <button onclick="resetZoom(1)">⟳</button>
+      </div>
+      <div id="slot-2" style="height: 100%"></div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3 ===== -->
+  <div class="view single">
+    <div class="clean">
+      <div class="last-updated" id="updated-3"></div>
+      <div class="zoom-controls">
+        <button onclick="zoomIn(2)">+</button>
+        <button onclick="zoomOut(2)">−</button>
+        <button onclick="resetZoom(2)">⟳</button>
+      </div>
+      <div id="slot-3" style="height: 100%"></div>
+    </div>
+  </div>
+
+  <!-- ===== COMBINED TAB ===== -->
+  <div class="view combined">
+    <div class="card">
+      <div class="header">
+        <div class="header-left">
+          <img src="assets/pldt.png" />
+          <span>PLDT</span>
+        </div>
+        <div>
+          <button onclick="setPLDTRange('6h', this)">6H</button>
+          <button onclick="setPLDTRange('1d', this)">1D</button>
+          <button onclick="setPLDTRange('7d', this)" class="active">7D</button>
+          <button onclick="setPLDTRange('14d', this)">14D</button>
+          <button onclick="setPLDTRange('30d', this)">30D</button>
+
           <button onclick="zoomIn(0)">+</button>
           <button onclick="zoomOut(0)">−</button>
           <button onclick="resetZoom(0)">⟳</button>
         </div>
-        <div id="slot-1" style="height: 100%"></div>
+      </div>
+      <div class="body" id="slot-c1">
+        <div class="last-updated" id="updated-c1"></div>
       </div>
     </div>
 
-    <!-- ===== TAB 2 ===== -->
-    <div class="view single">
-      <div class="clean">
-        <div class="zoom-controls">
+    <div class="card">
+      <div class="header">
+        <div class="header-left">
+          <img src="assets/globe.png" />
+          <span>GLOBE</span>
+        </div>
+        <div>
           <button onclick="zoomIn(1)">+</button>
           <button onclick="zoomOut(1)">−</button>
           <button onclick="resetZoom(1)">⟳</button>
         </div>
-        <div id="slot-2" style="height: 100%"></div>
+      </div>
+      <div class="body" id="slot-c2">
+        <div class="last-updated" id="updated-c2"></div>
       </div>
     </div>
 
-    <!-- ===== TAB 3 ===== -->
-    <div class="view single">
-      <div class="clean">
-        <div class="zoom-controls">
+    <div class="card">
+      <div class="header">
+        <div class="header-left">
+          <img src="assets/eastern.png" />
+          <span>EASTERN TELECOM</span>
+        </div>
+        <div>
           <button onclick="zoomIn(2)">+</button>
           <button onclick="zoomOut(2)">−</button>
           <button onclick="resetZoom(2)">⟳</button>
         </div>
-        <div id="slot-3" style="height: 100%"></div>
+      </div>
+      <div class="body" id="slot-c3">
+        <div class="last-updated" id="updated-c3"></div>
       </div>
     </div>
+  </div>
 
-    <!-- ===== COMBINED TAB ===== -->
-    <div class="view combined">
-      <div class="card">
-        <div class="header">
-          <div class="header-left">
-            <img src="assets/pldt.png" />
-            <span>PLDT</span>
-          </div>
-          <div>
-            <button onclick="zoomIn(0)">+</button>
-            <button onclick="zoomOut(0)">−</button>
-            <button onclick="resetZoom(0)">⟳</button>
-          </div>
-        </div>
-        <div class="body" id="slot-c1"></div>
-      </div>
+  <script>
 
-      <div class="card">
-        <div class="header">
-          <div class="header-left">
-            <img src="assets/globe.png" />
-            <span>GLOBE</span>
-          </div>
-          <div>
-            <button onclick="zoomIn(1)">+</button>
-            <button onclick="zoomOut(1)">−</button>
-            <button onclick="resetZoom(1)">⟳</button>
-          </div>
-        </div>
-        <div class="body" id="slot-c2"></div>
-      </div>
+    let autoRefreshGlobe = true;
+    let autoRefreshEastern = true;
 
-      <div class="card">
-        <div class="header">
-          <div class="header-left">
-            <img src="assets/eastern.png" />
-            <span>EASTERN TELECOM</span>
-          </div>
-          <div>
-            <button onclick="zoomIn(2)">+</button>
-            <button onclick="zoomOut(2)">−</button>
-            <button onclick="resetZoom(2)">⟳</button>
-          </div>
-        </div>
-        <div class="body" id="slot-c3"></div>
-      </div>
-    </div>
-
-    <script>
-      /* =====================================================
-   CONFIG
-===================================================== */
-      const PLDT_INDEX = 0; // Graph 1
-      const REFRESH_INTERVAL = 300000; // 5 mins
-      const PLDT_ACTIVITY_INTERVAL = 10000; // 10 seconds fake mouse move
-
-      /* =====================================================
-   WEBVIEWS
-===================================================== */
-      const webviews = [
-        makeWV("https://i-gate.net.ph/client/public/"),
-        makeWV(
-          "https://mrtg.globebusiness.com.ph/mrtg_customer/index.php?module=my_connection",
-        ),
-        makeWV("https://bandwidth10.eastern-tele.com/cacti/graph_view.php"),
-      ];
-
-      function makeWV(src) {
-        const w = document.createElement("webview");
-        w.src = src;
-        w.style.width = "100%";
-        w.style.height = "100%";
-        return w;
-      }
-
-      document.getElementById("slot-1").appendChild(webviews[0]);
-
-      /* =====================================================
-   TAB MANAGEMENT
-===================================================== */
-      let activeTab = 0;
-
-      function showTab(i) {
-        activeTab = i;
-
-        document
-          .querySelectorAll(".view")
-          .forEach((v) => v.classList.remove("active"));
-        document
-          .querySelectorAll(".tabs button")
-          .forEach((b) => b.classList.remove("active"));
-
-        document.querySelectorAll(".view")[i].classList.add("active");
-        document.querySelectorAll(".tabs button")[i].classList.add("active");
-
-        if (i === 0) slot("slot-1", 0);
-        if (i === 1) slot("slot-2", 1);
-        if (i === 2) slot("slot-3", 2);
-
-        if (i === 3) {
-          slot("slot-c1", 0);
-          slot("slot-c2", 1);
-          slot("slot-c3", 2);
-        }
-
-        handlePLDTActivity();
-        resetRefreshTimer();
-      }
-
-      function slot(id, index) {
-        const el = document.getElementById(id);
-        if (!el.contains(webviews[index])) {
-          el.appendChild(webviews[index]);
-        }
-      }
-
-      /* =====================================================
-   ZOOM
-===================================================== */
-      const zoom = [1, 1, 1];
-
-      function zoomIn(i) {
-        zoom[i] += 0.1;
-        webviews[i].setZoomFactor(zoom[i]);
-      }
-      function zoomOut(i) {
-        zoom[i] -= 0.1;
-        webviews[i].setZoomFactor(zoom[i]);
-      }
-      function resetZoom(i) {
-        zoom[i] = 1;
-        webviews[i].setZoomFactor(1);
-      }
-
-      /* =====================================================
-   AUTO REFRESH (VISIBLE ONLY)
-===================================================== */
-      let refreshTimer = null;
-      let isHovering = false;
-
-      function resetRefreshTimer() {
-        if (refreshTimer) clearTimeout(refreshTimer);
-        refreshTimer = setTimeout(refreshVisibleGraphs, REFRESH_INTERVAL);
-      }
-
-      function refreshVisibleGraphs() {
-        if (isHovering) {
-          resetRefreshTimer();
-          return;
-        }
-
-        if (activeTab === 0) webviews[0].reload();
-        if (activeTab === 1) webviews[1].reload();
-        if (activeTab === 2) webviews[2].reload();
-
-        if (activeTab === 3) {
-          webviews.forEach((wv) => wv.reload());
-        }
-
-        resetRefreshTimer();
-      }
-
-      /* =====================================================
-   HOVER DETECTION (PAUSE REFRESH ONLY)
-===================================================== */
-      ["slot-1", "slot-2", "slot-3", "slot-c1", "slot-c2", "slot-c3"].forEach(
-        (id) => {
-          const el = document.getElementById(id);
-          if (!el) return;
-
-          el.addEventListener("mouseenter", () => {
-            isHovering = true;
-          });
-
-          el.addEventListener("mouseleave", () => {
-            isHovering = false;
-            resetRefreshTimer();
-          });
-        },
-      );
-
-      /* =====================================================
-   AUTO-HIDE SCROLLBAR (5 SECONDS)
-===================================================== */
-      let scrollbarTimer = null;
-      const SCROLLBAR_HIDE_DELAY = 5000;
-
-      function showScrollbar() {
-        document.body.classList.remove("hide-scrollbar");
-
-        if (scrollbarTimer) clearTimeout(scrollbarTimer);
-        scrollbarTimer = setTimeout(hideScrollbar, SCROLLBAR_HIDE_DELAY);
-      }
-
-      function hideScrollbar() {
-        document.body.classList.add("hide-scrollbar");
-      }
-
-      /* Show scrollbar on activity */
-      ["mousemove", "wheel", "touchstart", "keydown"].forEach((evt) => {
-        document.addEventListener(evt, showScrollbar, { passive: true });
+    if (window.electronAPI) {
+      window.electronAPI.onToggleGlobe((val) => {
+        autoRefreshGlobe = val;
+        console.log('Auto Refresh Globe:', val);
       });
 
-      /* Hide scrollbar initially */
-      hideScrollbar();
+      window.electronAPI.onToggleEastern((val) => {
+        autoRefreshEastern = val;
+        console.log('Auto Refresh Eastern:', val);
+      });
+    }
 
-      /* =====================================================
-   PLDT FAKE ACTIVITY (GRAPH 1 ONLY)
+
+    /* =====================================================
+ CONFIG
 ===================================================== */
-      let pldtActivityTimer = null;
+    const PLDT_INDEX = 0; // Graph 1
+    const REFRESH_INTERVAL = 30000; // 30 seconds
+    const PLDT_ACTIVITY_INTERVAL = 10000; // 10 seconds fake mouse move
 
-      function isPLDTVisible() {
-        return activeTab === 0 || activeTab === 3;
+    /* =====================================================
+ WEBVIEWS
+===================================================== */
+    const webviews = [
+      makeWV("https://i-gate.net.ph/client/public/"),
+      makeWV(
+        "https://mrtg.globebusiness.com.ph/mrtg_customer/index.php?module=my_connection",
+      ),
+      makeWV("https://bandwidth10.eastern-tele.com/cacti/graph_view.php"),
+    ];
+
+    function makeWV(src) {
+      const w = document.createElement("webview");
+      w.src = src;
+      w.style.width = "100%";
+      w.style.height = "100%";
+      return w;
+    }
+
+    document.getElementById("slot-1").appendChild(webviews[0]);
+
+    /* =====================================================
+ TAB MANAGEMENT
+===================================================== */
+    let activeTab = 0;
+
+    function showTab(i) {
+      activeTab = i;
+
+      document
+        .querySelectorAll(".view")
+        .forEach((v) => v.classList.remove("active"));
+      document
+        .querySelectorAll(".tabs button")
+        .forEach((b) => b.classList.remove("active"));
+
+      document.querySelectorAll(".view")[i].classList.add("active");
+      document.querySelectorAll(".tabs button")[i].classList.add("active");
+
+      if (i === 0) slot("slot-1", 0);
+      if (i === 1) slot("slot-2", 1);
+      if (i === 2) slot("slot-3", 2);
+
+      if (i === 3) {
+        slot("slot-c1", 0);
+        slot("slot-c2", 1);
+        slot("slot-c3", 2);
+      }
+      if (i === 0 || i === 3) {
+        injectPLDT7DaysIntoIframe();
       }
 
-      function keepPLDTAlive() {
-        const wv = webviews[PLDT_INDEX];
-        if (!wv) return;
 
-        wv.executeJavaScript(`
+      handlePLDTActivity();
+      resetRefreshTimer();
+    }
+
+    function slot(id, index) {
+      const el = document.getElementById(id);
+      if (!el.contains(webviews[index])) {
+        el.appendChild(webviews[index]);
+      }
+    }
+
+    /* =====================================================
+ ZOOM
+===================================================== */
+    const zoom = [1, 1, 1];
+
+    function zoomIn(i) {
+      zoom[i] += 0.1;
+      webviews[i].setZoomFactor(zoom[i]);
+    }
+    function zoomOut(i) {
+      zoom[i] -= 0.1;
+      webviews[i].setZoomFactor(zoom[i]);
+    }
+    function resetZoom(i) {
+      zoom[i] = 1;
+      webviews[i].setZoomFactor(1);
+    }
+
+    /* =====================================================
+ AUTO REFRESH (VISIBLE ONLY)
+===================================================== */
+    let refreshTimer = null;
+    let isHovering = false;
+    let pldtRange = '7d'; // default
+
+    function resetRefreshTimer() {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(refreshVisibleGraphs, REFRESH_INTERVAL);
+    }
+
+    function buildPLDTURL() {
+      const now = new Date();
+      let startDate = new Date(now);
+
+      switch (pldtRange) {
+        case '6h':
+          startDate.setHours(startDate.getHours() - 6);
+          break;
+        case '1d':
+          startDate.setDate(startDate.getDate() - 1);
+          break;
+        case '7d':
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case '14d':
+          startDate.setDate(startDate.getDate() - 14);
+          break;
+        case '30d':
+          startDate.setDate(startDate.getDate() - 30);
+          break;
+      }
+
+      const start = startDate.toISOString().slice(0, 19).replace("T", " ");
+      const end = now.toISOString().slice(0, 19).replace("T", " ");
+
+      return (
+        "https://i-gate.net.ph/client/public/dashboard/dashboardChart" +
+        "?id=22445" +
+        "&startdate=" + encodeURIComponent(start) +
+        "&enddate=" + encodeURIComponent(end) +
+        "&conversion_type=bps"
+      );
+    }
+
+    function injectPLDTIntoIframe() {
+      const wv = webviews[PLDT_INDEX];
+      if (!wv) return;
+
+      const url = buildPLDTURL();
+
+      wv.executeJavaScript(`
+    (function () {
+      const iframe = document.getElementById('youriframe');
+      if (!iframe) return;
+      if (iframe.src !== "${url}") {
+        iframe.src = "${url}";
+      }
+    })();
+  `);
+    }
+
+
+    function refreshVisibleGraphs() {
+      if (isHovering) {
+        resetRefreshTimer();
+        return;
+      }
+
+      // PLDT
+      if (activeTab === 0 || activeTab === 3) {
+        injectPLDTIntoIframe();
+        updateTimestamp(activeTab === 0 ? 'updated-1' : 'updated-c1');
+      }
+
+      // Globe
+      if ((activeTab === 1 || activeTab === 3) && autoRefreshGlobe) {
+        webviews[1].reload();
+        updateTimestamp(activeTab === 1 ? 'updated-2' : 'updated-c2');
+      }
+
+      // Eastern
+      if ((activeTab === 2 || activeTab === 3) && autoRefreshEastern) {
+        webviews[2].reload();
+        updateTimestamp(activeTab === 2 ? 'updated-3' : 'updated-c3');
+      }
+
+
+      resetRefreshTimer();
+    }
+
+
+
+    /* =====================================================
+ HOVER DETECTION (PAUSE REFRESH ONLY)
+===================================================== */
+    ["slot-1", "slot-2", "slot-3", "slot-c1", "slot-c2", "slot-c3"].forEach(
+      (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        el.addEventListener("mouseenter", () => {
+          isHovering = true;
+        });
+
+        el.addEventListener("mouseleave", () => {
+          isHovering = false;
+          resetRefreshTimer();
+        });
+      },
+    );
+
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey && e.key === 'r') || e.key === 'F5') {
+        e.preventDefault();
+        console.log('Reload blocked to preserve PLDT session');
+      }
+    });
+
+    /* =====================================================
+ AUTO-HIDE SCROLLBAR (5 SECONDS)
+===================================================== */
+    let scrollbarTimer = null;
+    const SCROLLBAR_HIDE_DELAY = 5000;
+
+    function showScrollbar() {
+      document.body.classList.remove("hide-scrollbar");
+
+      if (scrollbarTimer) clearTimeout(scrollbarTimer);
+      scrollbarTimer = setTimeout(hideScrollbar, SCROLLBAR_HIDE_DELAY);
+    }
+
+    function hideScrollbar() {
+      document.body.classList.add("hide-scrollbar");
+    }
+
+    /* Show scrollbar on activity */
+    ["mousemove", "wheel", "touchstart", "keydown"].forEach((evt) => {
+      document.addEventListener(evt, showScrollbar, { passive: true });
+    });
+
+    /* Hide scrollbar initially */
+    hideScrollbar();
+
+    /* =====================================================
+ PLDT FAKE ACTIVITY (GRAPH 1 ONLY)
+===================================================== */
+    let pldtActivityTimer = null;
+
+    function isPLDTVisible() {
+      return activeTab === 0 || activeTab === 3;
+    }
+
+    function keepPLDTAlive() {
+      const wv = webviews[PLDT_INDEX];
+      if (!wv) return;
+
+      wv.executeJavaScript(`
     (function () {
       const evt = new MouseEvent('mousemove', {
         bubbles: true,
@@ -485,38 +624,68 @@
       document.dispatchEvent(evt);
     })();
   `);
-      }
+    }
 
-      function startPLDTActivity() {
-        if (pldtActivityTimer) return;
+    function startPLDTActivity() {
+      if (pldtActivityTimer) return;
 
-        pldtActivityTimer = setInterval(() => {
-          if (isPLDTVisible()) {
-            keepPLDTAlive();
-          }
-        }, PLDT_ACTIVITY_INTERVAL);
-      }
-
-      function stopPLDTActivity() {
-        if (pldtActivityTimer) {
-          clearInterval(pldtActivityTimer);
-          pldtActivityTimer = null;
-        }
-      }
-
-      function handlePLDTActivity() {
+      pldtActivityTimer = setInterval(() => {
         if (isPLDTVisible()) {
-          startPLDTActivity();
-        } else {
-          stopPLDTActivity();
+          keepPLDTAlive();
         }
-      }
+      }, PLDT_ACTIVITY_INTERVAL);
+    }
 
-      /* =====================================================
-   START EVERYTHING
-===================================================== */
-      handlePLDTActivity();
+    function stopPLDTActivity() {
+      if (pldtActivityTimer) {
+        clearInterval(pldtActivityTimer);
+        pldtActivityTimer = null;
+      }
+    }
+
+    function handlePLDTActivity() {
+      if (isPLDTVisible()) {
+        startPLDTActivity();
+      } else {
+        stopPLDTActivity();
+      }
+    }
+    function setPLDTRange(range, el) {
+      pldtRange = range;
+
+      document
+        .querySelectorAll('.pldt-range-switch button')
+        .forEach(b => b.classList.remove('active'));
+
+      if (el) el.classList.add('active');
+
+      injectPLDTIntoIframe();
       resetRefreshTimer();
-    </script>
-  </body>
+    }
+
+    function updateTimestamp(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+
+      const now = new Date();
+      const formatted =
+        now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+
+      el.textContent = '🕒 Updated: ' + formatted;
+    }
+
+
+    /* =====================================================
+ START EVERYTHING
+===================================================== */
+    handlePLDTActivity();
+    resetRefreshTimer();
+  </script>
+</body>
+
 </html>
