@@ -1,6 +1,6 @@
 {
   "name": "bandwidth-dashboard",
-  "version": "1.2.2",
+  "version": "1.2.7",
   "description": "Internal bandwidth monitoring dashboard",
   "author": "Joshua Grijaldo",
   "main": "main.js",

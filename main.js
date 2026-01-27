@@ -22,6 +22,14 @@ let autoRefreshEastern = true;
 // update interval (hours)
 const UPDATE_INTERVAL_HOURS = 4;
 
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  if (url.startsWith('https://bandwidth10.eastern-tele.com')) {
+    event.preventDefault();
+    callback(true); // trust this cert ONLY
+  } else {
+    callback(false);
+  }
+});
 /* ======================
    WINDOW
 ====================== */
@@ -105,7 +113,7 @@ function createMenu() {
           label: 'About',
           click() {
             dialog.showMessageBox({
-              title: 'Bandwidth Monitoring',
+              title: 'Bandwidth Monitoring ' + app.getVersion(),
               message:
                 `Bandwidth Monitoring Dashboard\n\n` +
                 `Version ${app.getVersion()}\n\n` +
@@ -219,10 +227,14 @@ function startBackgroundUpdateCheck() {
 ====================== */
 app.whenReady().then(() => {
   createWindow();
-  createTray();
+
+  // 🔌 OFFLINE / LAN UPDATE SERVER
+  autoUpdater.setFeedURL({
+    provider: 'generic',
+    url: 'http://172.30.2.13:5500'
+  });
 
   autoUpdater.checkForUpdatesAndNotify();
-  startBackgroundUpdateCheck();
 });
 
 app.on('window-all-closed', () => {
