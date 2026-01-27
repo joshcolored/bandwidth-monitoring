@@ -9,13 +9,17 @@
     "start": "electron .",
     "build": "electron-builder"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshcolored/bandwidth-monitoring"
+  },
   "devDependencies": {
     "electron": "^28.2.0",
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.krazene.bandwidthdashboard",
-    "productName": "Bandwidth Dashboard",
+    "appId": "com.joshcolored.bandwidthmonitoring",
+    "productName": "Bandwidth Monitoring Dashboard",
     "directories": {
       "output": "dist"
     },
@@ -33,6 +37,17 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Bandwidth Monitoring Dashboard",
       "license": "license.txt"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "joshcolored",
+        "repo": "bandwidth-monitoring"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-log": "^5.4.3",
+    "electron-updater": "^6.7.3"
   }
 }
