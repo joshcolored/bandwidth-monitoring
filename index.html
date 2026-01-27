@@ -20,6 +20,49 @@
       box-sizing: border-box;
     }
 
+    #update-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .update-box {
+      background: #111827;
+      border: 1px solid #374151;
+      padding: 20px;
+      border-radius: 12px;
+      width: 360px;
+      text-align: center;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #374151;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    #progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #3b82f6;
+      transition: width .2s;
+    }
+
+    #restart-btn {
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
     body {
       margin: 0;
       height: 100vh;
@@ -685,7 +728,47 @@
 ===================================================== */
     handlePLDTActivity();
     resetRefreshTimer();
+
+    const modal = document.getElementById('update-modal');
+    const text = document.getElementById('update-text');
+    const fill = document.getElementById('progress-fill');
+    const restartBtn = document.getElementById('restart-btn');
+
+    window.updater.onStatus(data => {
+      modal.style.display = 'flex';
+
+      if (data.status === 'checking') {
+        text.textContent = 'Checking for updates…';
+      }
+
+      if (data.status === 'downloading') {
+        text.textContent = `Downloading update… ${data.percent}%`;
+        fill.style.width = data.percent + '%';
+      }
+
+      if (data.status === 'ready') {
+        text.textContent = 'Update ready. Restart to apply.';
+        restartBtn.style.display = 'inline-block';
+      }
+    });
+
+    restartBtn.onclick = () => {
+      window.updater.restart();
+    };
+
   </script>
+
+  <div id="update-modal" style="display:none">
+    <div class="update-box">
+      <h3>Updating Application</h3>
+      <p id="update-text">Checking for updates…</p>
+      <div class="progress-bar">
+        <div id="progress-fill"></div>
+      </div>
+      <button id="restart-btn" style="display:none">Restart Now</button>
+    </div>
+  </div>
+
 </body>
 
 </html>

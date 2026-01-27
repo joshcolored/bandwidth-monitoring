@@ -1,24 +1,38 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const {
+  app,
+  BrowserWindow,
+  Menu,
+  ipcMain,
+  dialog,
+  Tray,
+  Notification
+} = require('electron');
+
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
-
 let mainWindow;
+let tray = null;
 
 // refresh flags
 let autoRefreshGlobe = true;
 let autoRefreshEastern = true;
 
+// update interval (hours)
+const UPDATE_INTERVAL_HOURS = 4;
 
+/* ======================
+   WINDOW
+====================== */
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 900,
     title: 'Bandwidth Monitoring',
+    icon: path.join(__dirname, 'assets/app.ico'),
     webPreferences: {
-      icon: path.join(__dirname, 'assets/app.ico'),
-      preload: __dirname + '/preload.js',
+      preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
       contextIsolation: true,
       nodeIntegration: false
@@ -26,26 +40,30 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.setTitle('Bandwidth Monitoring');
   });
+
   createMenu();
 }
 
+/* ======================
+   MENU
+====================== */
 function createMenu() {
   const template = [
     {
       label: 'File',
-      submenu: [{ role: 'quit' }]
-    },
-    {
-      label: 'Edit',
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        {
+          label: 'Check for Updates',
+          click() {
+            autoUpdater.checkForUpdates();
+          }
+        },
         { type: 'separator' },
-        { role: 'copy' },
-        { role: 'paste' }
+        { role: 'quit' }
       ]
     },
     {
@@ -57,7 +75,10 @@ function createMenu() {
           checked: true,
           click(menuItem) {
             autoRefreshGlobe = menuItem.checked;
-            mainWindow.webContents.send('toggle-globe-refresh', autoRefreshGlobe);
+            mainWindow.webContents.send(
+              'toggle-globe-refresh',
+              autoRefreshGlobe
+            );
           }
         },
         {
@@ -66,7 +87,10 @@ function createMenu() {
           checked: true,
           click(menuItem) {
             autoRefreshEastern = menuItem.checked;
-            mainWindow.webContents.send('toggle-eastern-refresh', autoRefreshEastern);
+            mainWindow.webContents.send(
+              'toggle-eastern-refresh',
+              autoRefreshEastern
+            );
           }
         },
         { type: 'separator' },
@@ -75,18 +99,17 @@ function createMenu() {
       ]
     },
     {
-      label: 'Window',
-      submenu: [{ role: 'minimize' }, { role: 'close' }]
-    },
-    {
       label: 'Help',
       submenu: [
         {
           label: 'About',
           click() {
-            require('electron').dialog.showMessageBox({
-              title: 'Bandwidth Monitoring Dashboard',
-              message: 'Bandwidth Monitoring Dashboard\nVersion 1.2\n\nDeveloped by Joshua Grijaldo\n\nAll rights reserved.'
+            dialog.showMessageBox({
+              title: 'Bandwidth Monitoring',
+              message:
+                `Bandwidth Monitoring Dashboard\n\n` +
+                `Version ${app.getVersion()}\n\n` +
+                `Developed by Joshua Grijaldo`
             });
           }
         }
@@ -97,37 +120,110 @@ function createMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
+/* ======================
+   TRAY
+====================== */
+function createTray() {
+  tray = new Tray(path.join(__dirname, 'assets/app.ico'));
+
+  tray.setToolTip('Bandwidth Monitoring');
+
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      {
+        label: 'Open',
+        click() {
+          mainWindow.show();
+        }
+      },
+      {
+        label: 'Check for Updates',
+        click() {
+          autoUpdater.checkForUpdates();
+        }
+      },
+      { type: 'separator' },
+      { role: 'quit' }
+    ])
+  );
+
+  tray.on('double-click', () => mainWindow.show());
+}
+
+/* ======================
+   AUTO UPDATER
+====================== */
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = true;
 
+// checking
+autoUpdater.on('checking-for-update', () => {
+  mainWindow.webContents.send('update-status', {
+    status: 'checking'
+  });
+});
+
+// available
+autoUpdater.on('update-available', () => {
+  mainWindow.webContents.send('update-status', {
+    status: 'downloading',
+    percent: 0
+  });
+});
+
+// progress
+autoUpdater.on('download-progress', progress => {
+  const percent = Math.round(progress.percent);
+
+  mainWindow.setProgressBar(percent / 100);
+
+  mainWindow.webContents.send('update-status', {
+    status: 'downloading',
+    percent
+  });
+});
+
+// downloaded
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.setProgressBar(-1);
+
+  new Notification({
+    title: 'Bandwidth Monitoring',
+    body: 'Update downloaded. Restart to apply.'
+  }).show();
+
+  mainWindow.webContents.send('update-status', {
+    status: 'ready'
+  });
+});
+
+/* ======================
+   IPC
+====================== */
+ipcMain.handle('restart-app', () => {
+  autoUpdater.quitAndInstall();
+});
+
+/* ======================
+   BACKGROUND UPDATE
+====================== */
+function startBackgroundUpdateCheck() {
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, UPDATE_INTERVAL_HOURS * 60 * 60 * 1000);
+}
+
+/* ======================
+   APP
+====================== */
 app.whenReady().then(() => {
   createWindow();
+  createTray();
 
   autoUpdater.checkForUpdatesAndNotify();
+  startBackgroundUpdateCheck();
 });
-
-autoUpdater.on('update-available', () => {
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Update Available',
-    message: 'A new version is downloading in the background.'
-  });
-});
-
-autoUpdater.on('update-downloaded', () => {
-  dialog.showMessageBox({
-    type: 'question',
-    buttons: ['Restart Now', 'Later'],
-    defaultId: 0,
-    message: 'Update ready. Restart to apply?'
-  }).then(result => {
-    if (result.response === 0) {
-      autoUpdater.quitAndInstall();
-    }
-  });
-});
-
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
