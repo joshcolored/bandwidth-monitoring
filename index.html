@@ -256,6 +256,28 @@
     .zoom-controls .pldt-range-switch button.active {
       background: var(--accent);
     }
+
+    .refresh-status {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      z-index: 15;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    .refresh-status.active {
+      color: #22c55e;
+    }
+
+    .refresh-status.paused {
+      color: #f59e0b;
+    }
   </style>
 </head>
 
@@ -286,6 +308,9 @@
   <div class="view active single">
     <div class="clean">
       <div class="last-updated" id="updated-1"></div>
+      <div class="refresh-status">
+        ⏸ Refresh Paused
+      </div>
       <div class="zoom-controls">
         <div class="pldt-range-switch">
           <button onclick="setPLDTRange('6h', this)">6H</button>
@@ -307,6 +332,9 @@
   <div class="view single">
     <div class="clean">
       <div class="last-updated" id="updated-2"></div>
+      <div class="refresh-status">
+        ⏸ Refresh Paused
+      </div>
       <div class="zoom-controls">
         <button onclick="zoomIn(1)">+</button>
         <button onclick="zoomOut(1)">−</button>
@@ -320,6 +348,10 @@
   <div class="view single">
     <div class="clean">
       <div class="last-updated" id="updated-3"></div>
+      <div class="refresh-status">
+        ⏸ Refresh Paused
+      </div>
+
       <div class="zoom-controls">
         <button onclick="zoomIn(2)">+</button>
         <button onclick="zoomOut(2)">−</button>
@@ -390,40 +422,37 @@
   </div>
 
   <script>
-
+    /* ======================
+       GLOBAL FLAGS
+    ====================== */
     let autoRefreshGlobe = true;
     let autoRefreshEastern = true;
+    let pldtDomReady = false;
+    let refreshEnabled = true;
 
-    if (window.electronAPI) {
-      window.electronAPI.onToggleGlobe((val) => {
-        autoRefreshGlobe = val;
-        console.log('Auto Refresh Globe:', val);
-      });
-
-      window.electronAPI.onToggleEastern((val) => {
-        autoRefreshEastern = val;
-        console.log('Auto Refresh Eastern:', val);
-      });
-    }
+    /* ======================
+       CONFIG
+    ====================== */
+    const PLDT_INDEX = 0;
+    const REFRESH_INTERVAL = 3 * 60 * 1000; // 3 minutes
+    const PLDT_RELOAD_INTERVAL = 5 * 60 * 1000; // 5 minutes SAFE
+    const EASTERN_INDEX = 2;
+    const EASTERN_UTIL_CLICK_INTERVAL = 3 * 60 * 1000; // 3 minutes
 
 
-    /* =====================================================
- CONFIG
-===================================================== */
-    const PLDT_INDEX = 0; // Graph 1
-    const REFRESH_INTERVAL = 30000; // 30 seconds
-    const PLDT_ACTIVITY_INTERVAL = 10000; // 10 seconds fake mouse move
-
-    /* =====================================================
- WEBVIEWS
-===================================================== */
+    /* ======================
+       WEBVIEWS
+    ====================== */
     const webviews = [
       makeWV("https://i-gate.net.ph/client/public/"),
-      makeWV(
-        "https://mrtg.globebusiness.com.ph/mrtg_customer/index.php?module=my_connection",
-      ),
-      makeWV("https://bandwidth10.eastern-tele.com/cacti/graph_view.php"),
+      makeWV("https://mrtg.globebusiness.com.ph/mrtg_customer/index.php?module=my_connection"),
+      makeWV("https://bandwidth10.eastern-tele.com/cacti/graph_view.php")
     ];
+
+    webviews[PLDT_INDEX].addEventListener('dom-ready', () => {
+      pldtDomReady = true;
+      console.log('[PLDT] webview dom-ready');
+    });
 
     function makeWV(src) {
       const w = document.createElement("webview");
@@ -435,264 +464,90 @@
 
     document.getElementById("slot-1").appendChild(webviews[0]);
 
-    /* =====================================================
- TAB MANAGEMENT
-===================================================== */
-    let activeTab = 0;
+    function updateRefreshStatus() {
+      const activeView = document.querySelector('.view.active');
+      if (!activeView) return;
 
-    function showTab(i) {
-      activeTab = i;
+      const el = activeView.querySelector('.refresh-status');
+      if (!el) return;
 
-      document
-        .querySelectorAll(".view")
-        .forEach((v) => v.classList.remove("active"));
-      document
-        .querySelectorAll(".tabs button")
-        .forEach((b) => b.classList.remove("active"));
+      refreshEnabled = autoRefreshGlobe || autoRefreshEastern;
 
-      document.querySelectorAll(".view")[i].classList.add("active");
-      document.querySelectorAll(".tabs button")[i].classList.add("active");
-
-      if (i === 0) slot("slot-1", 0);
-      if (i === 1) slot("slot-2", 1);
-      if (i === 2) slot("slot-3", 2);
-
-      if (i === 3) {
-        slot("slot-c1", 0);
-        slot("slot-c2", 1);
-        slot("slot-c3", 2);
-      }
-      if (i === 0 || i === 3) {
-        injectPLDT7DaysIntoIframe();
-      }
-
-
-      handlePLDTActivity();
-      resetRefreshTimer();
-    }
-
-    function slot(id, index) {
-      const el = document.getElementById(id);
-      if (!el.contains(webviews[index])) {
-        el.appendChild(webviews[index]);
-      }
-    }
-
-    /* =====================================================
- ZOOM
-===================================================== */
-    const zoom = [1, 1, 1];
-
-    function zoomIn(i) {
-      zoom[i] += 0.1;
-      webviews[i].setZoomFactor(zoom[i]);
-    }
-    function zoomOut(i) {
-      zoom[i] -= 0.1;
-      webviews[i].setZoomFactor(zoom[i]);
-    }
-    function resetZoom(i) {
-      zoom[i] = 1;
-      webviews[i].setZoomFactor(1);
-    }
-
-    /* =====================================================
- AUTO REFRESH (VISIBLE ONLY)
-===================================================== */
-    let refreshTimer = null;
-    let isHovering = false;
-    let pldtRange = '7d'; // default
-
-    function resetRefreshTimer() {
-      if (refreshTimer) clearTimeout(refreshTimer);
-      refreshTimer = setTimeout(refreshVisibleGraphs, REFRESH_INTERVAL);
-    }
-
-    function buildPLDTURL() {
-      const now = new Date();
-      let startDate = new Date(now);
-
-      switch (pldtRange) {
-        case '6h':
-          startDate.setHours(startDate.getHours() - 6);
-          break;
-        case '1d':
-          startDate.setDate(startDate.getDate() - 1);
-          break;
-        case '7d':
-          startDate.setDate(startDate.getDate() - 7);
-          break;
-        case '14d':
-          startDate.setDate(startDate.getDate() - 14);
-          break;
-        case '30d':
-          startDate.setDate(startDate.getDate() - 30);
-          break;
-      }
-
-      const start = startDate.toISOString().slice(0, 19).replace("T", " ");
-      const end = now.toISOString().slice(0, 19).replace("T", " ");
-
-      return (
-        "https://i-gate.net.ph/client/public/dashboard/dashboardChart" +
-        "?id=22445" +
-        "&startdate=" + encodeURIComponent(start) +
-        "&enddate=" + encodeURIComponent(end) +
-        "&conversion_type=bps"
-      );
-    }
-
-    function injectPLDTIntoIframe() {
-      const wv = webviews[PLDT_INDEX];
-      if (!wv) return;
-
-      const url = buildPLDTURL();
-
-      wv.executeJavaScript(`
-    (function () {
-      const iframe = document.getElementById('youriframe');
-      if (!iframe) return;
-      if (iframe.src !== "${url}") {
-        iframe.src = "${url}";
-      }
-    })();
-  `);
-    }
-
-
-    function refreshVisibleGraphs() {
-      if (isHovering) {
-        resetRefreshTimer();
-        return;
-      }
-
-      // PLDT
-      if (activeTab === 0 || activeTab === 3) {
-        injectPLDTIntoIframe();
-        updateTimestamp(activeTab === 0 ? 'updated-1' : 'updated-c1');
-      }
-
-      // Globe
-      if ((activeTab === 1 || activeTab === 3) && autoRefreshGlobe) {
-        webviews[1].reload();
-        updateTimestamp(activeTab === 1 ? 'updated-2' : 'updated-c2');
-      }
-
-      // Eastern
-      if ((activeTab === 2 || activeTab === 3) && autoRefreshEastern) {
-        webviews[2].reload();
-        updateTimestamp(activeTab === 2 ? 'updated-3' : 'updated-c3');
-      }
-
-
-      resetRefreshTimer();
-    }
-
-
-
-    /* =====================================================
- HOVER DETECTION (PAUSE REFRESH ONLY)
-===================================================== */
-    ["slot-1", "slot-2", "slot-3", "slot-c1", "slot-c2", "slot-c3"].forEach(
-      (id) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-
-        el.addEventListener("mouseenter", () => {
-          isHovering = true;
-        });
-
-        el.addEventListener("mouseleave", () => {
-          isHovering = false;
-          resetRefreshTimer();
-        });
-      },
-    );
-
-
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey && e.key === 'r') || e.key === 'F5') {
-        e.preventDefault();
-        console.log('Reload blocked to preserve PLDT session');
-      }
-    });
-
-    /* =====================================================
- AUTO-HIDE SCROLLBAR (5 SECONDS)
-===================================================== */
-    let scrollbarTimer = null;
-    const SCROLLBAR_HIDE_DELAY = 5000;
-
-    function showScrollbar() {
-      document.body.classList.remove("hide-scrollbar");
-
-      if (scrollbarTimer) clearTimeout(scrollbarTimer);
-      scrollbarTimer = setTimeout(hideScrollbar, SCROLLBAR_HIDE_DELAY);
-    }
-
-    function hideScrollbar() {
-      document.body.classList.add("hide-scrollbar");
-    }
-
-    /* Show scrollbar on activity */
-    ["mousemove", "wheel", "touchstart", "keydown"].forEach((evt) => {
-      document.addEventListener(evt, showScrollbar, { passive: true });
-    });
-
-    /* Hide scrollbar initially */
-    hideScrollbar();
-
-    /* =====================================================
- PLDT FAKE ACTIVITY (GRAPH 1 ONLY)
-===================================================== */
-    let pldtActivityTimer = null;
-
-    function isPLDTVisible() {
-      return activeTab === 0 || activeTab === 3;
-    }
-
-    function keepPLDTAlive() {
-      const wv = webviews[PLDT_INDEX];
-      if (!wv) return;
-
-      wv.executeJavaScript(`
-    (function () {
-      const evt = new MouseEvent('mousemove', {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        clientX: Math.random() * window.innerWidth,
-        clientY: Math.random() * window.innerHeight
-      });
-      document.dispatchEvent(evt);
-    })();
-  `);
-    }
-
-    function startPLDTActivity() {
-      if (pldtActivityTimer) return;
-
-      pldtActivityTimer = setInterval(() => {
-        if (isPLDTVisible()) {
-          keepPLDTAlive();
-        }
-      }, PLDT_ACTIVITY_INTERVAL);
-    }
-
-    function stopPLDTActivity() {
-      if (pldtActivityTimer) {
-        clearInterval(pldtActivityTimer);
-        pldtActivityTimer = null;
-      }
-    }
-
-    function handlePLDTActivity() {
-      if (isPLDTVisible()) {
-        startPLDTActivity();
+      if (refreshEnabled) {
+        el.textContent = '▶ Refresh Active';
+        el.classList.add('active');
+        el.classList.remove('paused');
       } else {
-        stopPLDTActivity();
+        el.textContent = '⏸ Refresh Paused';
+        el.classList.add('paused');
+        el.classList.remove('active');
       }
     }
+
+    /* ====================== 
+       EASTERN UTILS
+    ====================== */
+    function safeEasternExec(script) {
+      const wv = webviews[EASTERN_INDEX];
+      if (!wv) return;
+
+      wv.executeJavaScript(`
+    (function(){
+      try {
+        ${script}
+      } catch(e) {
+        console.warn('[Eastern inject skipped]', e);
+      }
+    })();
+  `, true).catch(() => { });
+    }
+
+    /* ====================== 
+       EASTERN UTILS
+    ====================== */
+    function clickEasternUtilities() {
+      safeEasternExec(`
+    const btn = document.getElementById('graph_41775_util');
+    if (btn) {
+      btn.click();
+      console.log('[Eastern] Utilities button clicked');
+    } else {
+      console.warn('[Eastern] Utilities button not found');
+    }
+  `);
+    }
+
+    let easternUtilTimer = null;
+
+    function startEasternUtilLoop() {
+      if (easternUtilTimer) return;
+
+      easternUtilTimer = setInterval(() => {
+        if (
+          autoRefreshEastern &&
+          (activeTab === 2 || activeTab === 3)
+        ) {
+          clickEasternUtilities();
+        }
+      }, EASTERN_UTIL_CLICK_INTERVAL);
+    }
+
+    function stopEasternUtilLoop() {
+      if (easternUtilTimer) {
+        clearInterval(easternUtilTimer);
+        easternUtilTimer = null;
+      }
+    }
+
+
+    /* ======================
+       PLDT RANGE STATE
+    ====================== */
+    let pldtRange = '7d';
+
+    /* ======================
+       RANGE HANDLER
+    ====================== */
     function setPLDTRange(range, el) {
       pldtRange = range;
 
@@ -706,57 +561,296 @@
       resetRefreshTimer();
     }
 
-    function updateTimestamp(targetId) {
-      const el = document.getElementById(targetId);
-      if (!el) return;
 
-      const now = new Date();
-      const formatted =
-        now.getFullYear() + '-' +
-        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getDate()).padStart(2, '0') + ' ' +
-        String(now.getHours()).padStart(2, '0') + ':' +
-        String(now.getMinutes()).padStart(2, '0') + ':' +
-        String(now.getSeconds()).padStart(2, '0');
+    function isRefreshAllowedForTab() {
+      if (activeTab === 1 && !autoRefreshGlobe) return false;
+      if (activeTab === 2 && !autoRefreshEastern) return false;
 
-      el.textContent = '🕒 Updated: ' + formatted;
+      if (activeTab === 3) {
+        // ALL BANDWIDTH → refresh ONLY if at least one is enabled
+        return autoRefreshGlobe || autoRefreshEastern;
+      }
+
+      return true;
     }
 
+    /* ======================
+       TAB MANAGEMENT
+    ====================== */
+    let activeTab = 0;
 
-    /* =====================================================
- START EVERYTHING
-===================================================== */
-    handlePLDTActivity();
-    resetRefreshTimer();
+    function showTab(i) {
+      activeTab = i;
 
-    const modal = document.getElementById('update-modal');
-    const text = document.getElementById('update-text');
-    const fill = document.getElementById('progress-fill');
-    const restartBtn = document.getElementById('restart-btn');
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
 
-    window.updater.onStatus(data => {
-      modal.style.display = 'flex';
+      document.querySelectorAll(".view")[i].classList.add("active");
+      document.querySelectorAll(".tabs button")[i].classList.add("active");
 
-      if (data.status === 'checking') {
-        text.textContent = 'Checking for updates…';
+      if (i === 0) slot("slot-1", 0);
+      if (i === 1) slot("slot-2", 1);
+      if (i === 2) slot("slot-3", 2);
+
+      if (i === 3) {
+        slot("slot-c1", 0);
+        slot("slot-c2", 1);
+        slot("slot-c3", 2);
       }
 
-      if (data.status === 'downloading') {
-        text.textContent = `Downloading update… ${data.percent}%`;
-        fill.style.width = data.percent + '%';
+      if (i === 2 || i === 3) {
+        startEasternUtilLoop();
+      } else {
+        stopEasternUtilLoop();
       }
 
-      if (data.status === 'ready') {
-        text.textContent = 'Update ready. Restart to apply.';
-        restartBtn.style.display = 'inline-block';
+
+      if (i === 0 || i === 3) {
+        const waitForPLDT = setInterval(() => {
+          if (pldtDomReady) {
+            injectPLDTIntoIframe();
+            startPLDTLoop();
+            clearInterval(waitForPLDT);
+          }
+        }, 100);
+      } else {
+        stopPLDTLoop();
+      }
+
+      updateRefreshStatus();
+      resetRefreshTimer();
+    }
+
+    function slot(id, index) {
+      const el = document.getElementById(id);
+      const wv = webviews[index];
+
+      if (!el.contains(wv)) {
+        // 🔥 IMPORTANT: reset dom-ready when moving webview
+        if (index === PLDT_INDEX) {
+          pldtDomReady = false;
+          console.log('[PLDT] webview moved → waiting for dom-ready');
+        }
+
+        el.appendChild(wv);
+      }
+    }
+
+    webviews[EASTERN_INDEX].addEventListener('did-finish-load', () => {
+      if (autoRefreshEastern) {
+        setTimeout(clickEasternUtilities, 2000);
       }
     });
 
-    restartBtn.onclick = () => {
-      window.updater.restart();
-    };
 
+
+    /* ======================
+       PLDT URL BUILDER (FIXED)
+    ====================== */
+    function buildPLDTURL() {
+      const now = new Date();
+      const start = new Date(now);
+
+      switch (pldtRange) {
+        case '6h': start.setHours(start.getHours() - 6); break;
+        case '1d': start.setDate(start.getDate() - 1); break;
+        case '7d': start.setDate(start.getDate() - 7); break;
+        case '14d': start.setDate(start.getDate() - 14); break;
+        case '30d': start.setDate(start.getDate() - 30); break;
+      }
+
+      return (
+        "https://i-gate.net.ph/client/public/dashboard/dashboardChart" +
+        "?id=22445" +
+        "&startdate=" + encodeURIComponent(start.toISOString().slice(0, 19).replace("T", " ")) +
+        "&enddate=" + encodeURIComponent(now.toISOString().slice(0, 19).replace("T", " ")) +
+        "&conversion_type=bps"
+      );
+    }
+
+    /* ======================
+       SAFE EXEC
+    ====================== */
+    function safePLDTExec(script) {
+      const wv = webviews[PLDT_INDEX];
+      if (!wv || !pldtDomReady) {
+        console.warn('[PLDT] exec skipped (webview not ready)');
+        return;
+      }
+
+      wv.executeJavaScript(`
+    (function(){
+      try {
+        ${script}
+      } catch (e) {
+        console.warn('[PLDT inject error]', e);
+      }
+    })();
+  `, true).catch(() => {
+        // swallow race-condition errors
+      });
+    }
+
+
+    /* ======================
+       INJECT PLDT
+    ====================== */
+    function injectPLDTIntoIframe() {
+      if (!pldtDomReady) return;
+
+      const url = buildPLDTURL();
+
+      safePLDTExec(`
+    const iframe = document.getElementById('youriframe');
+    if (!iframe) return;
+
+    if (iframe.src !== "${url}") {
+      iframe.src = "${url}";
+    }
+  `);
+      updateTimestamp(activeTab === 0 ? 'updated-1' : 'updated-c1');
+    }
+
+    /* ======================
+       IDLE NEUTRALIZER
+    ====================== */
+    function neutralizePLDTIdle() {
+      safePLDTExec(`
+    if (window.CheckIdleTime) window.CheckIdleTime = function(){};
+    if (window.IDLE_TIMEOUT) window.IDLE_TIMEOUT = 99999999;
+
+    const modal = document.getElementById('modal_session');
+    if (modal) modal.remove();
+  `);
+    }
+
+    webviews[PLDT_INDEX].addEventListener('did-finish-load', () => {
+      neutralizePLDTIdle();
+    });
+
+    /* ======================
+       PLDT SAFE LOOP
+    ====================== */
+    let pldtTimer = null;
+
+    function startPLDTLoop() {
+      if (pldtTimer) return;
+
+      pldtTimer = setInterval(() => {
+        if (activeTab === 0 || activeTab === 3) {
+          injectPLDTIntoIframe();
+          neutralizePLDTIdle();
+        }
+      }, PLDT_RELOAD_INTERVAL);
+    }
+
+    function stopPLDTLoop() {
+      if (pldtTimer) {
+        clearInterval(pldtTimer);
+        pldtTimer = null;
+      }
+    }
+
+    /* ======================
+       NORMAL REFRESH
+    ====================== */
+    let refreshTimer = null;
+
+    function resetRefreshTimer() {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(refreshVisibleGraphs, REFRESH_INTERVAL);
+    }
+
+    function refreshVisibleGraphs() {
+      if (!isRefreshAllowedForTab()) {
+        resetRefreshTimer();
+        return;
+      }
+
+      // GLOBE
+      if (
+        (activeTab === 1 || activeTab === 3) &&
+        autoRefreshGlobe
+      ) {
+        webviews[1].reload();
+        updateTimestamp(activeTab === 1 ? 'updated-2' : 'updated-c2');
+      }
+
+      // EASTERN
+      if (
+        (activeTab === 2 || activeTab === 3) &&
+        autoRefreshEastern
+      ) {
+        webviews[2].reload();
+        updateTimestamp(activeTab === 2 ? 'updated-3' : 'updated-c3');
+      }
+
+      // 🔁 KEEP PLDT RANGE
+      if (activeTab === 0 || activeTab === 3) {
+        injectPLDTIntoIframe();
+      }
+
+      updateRefreshStatus();
+      resetRefreshTimer();
+    }
+
+    /* ======================
+       TIMESTAMP
+    ====================== */
+    function updateTimestamp(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const now = new Date();
+      el.textContent = '🕒 Updated: ' + now.toLocaleString();
+    }
+
+
+
+    /* ======================
+   ZOOM CONTROLS (RESTORED)
+====================== */
+    const zoom = [1, 1, 1];
+
+    function zoomIn(index) {
+      if (!webviews[index]) return;
+      zoom[index] += 0.1;
+      webviews[index].setZoomFactor(zoom[index]);
+    }
+
+    function zoomOut(index) {
+      if (!webviews[index]) return;
+      zoom[index] = Math.max(0.2, zoom[index] - 0.1);
+      webviews[index].setZoomFactor(zoom[index]);
+    }
+
+    function resetZoom(index) {
+      if (!webviews[index]) return;
+      zoom[index] = 1;
+      webviews[index].setZoomFactor(1);
+    }
+
+    window.electronAPI.onToggleGlobe(val => {
+      autoRefreshGlobe = val;
+      updateRefreshStatus();
+    });
+
+    window.electronAPI.onToggleEastern(val => {
+      autoRefreshEastern = val;
+      updateRefreshStatus();
+    });
+
+    function resetRefreshTimer() {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(refreshVisibleGraphs, REFRESH_INTERVAL);
+    }
+    /* ======================
+       START
+    ====================== */
+    resetRefreshTimer();
   </script>
+
+
 
   <div id="update-modal" style="display:none">
     <div class="update-box">

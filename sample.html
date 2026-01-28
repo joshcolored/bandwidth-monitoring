@@ -1,0 +1,350 @@
+<html lang="en">
+
+<head>
+    <link rel="shortcut icon" href="https://i-gate.net.ph/client/public/images/favicon.png" size="32x32"
+        type="image/png">
+    <link rel="icon" href="https://i-gate.net.ph/client/public/images/favicon.png" size="32x32" type="image/png">
+    <title>PLDT</title>
+
+
+    <link href="https://i-gate.net.ph/client/public/admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://i-gate.net.ph/client/public/admin/css/bootstrap-theme.css" rel="stylesheet">
+    <link href="https://i-gate.net.ph/client/public/admin/css/font-awesome.css" rel="stylesheet">
+    <link href="https://i-gate.net.ph/client/public/admin/css/style.css?ts=1769551201" rel="stylesheet">
+    <link href="https://i-gate.net.ph/client/public/admin/css/animate.css" rel="stylesheet">
+    <link href="https://i-gate.net.ph/client/public/admin/css/bootstrap-datetimepicker.css" rel="stylesheet">
+    <!-- <link href="https://i-gate.net.ph/client/public/admin/css/pace.css" rel="stylesheet"> -->
+    <link href="https://i-gate.net.ph/client/public/admin/css/pnotify.custom.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://i-gate.net.ph/client/public/css/animate-custom.css">
+    <link rel="stylesheet" type="text/css" href="https://i-gate.net.ph/client/public/admin/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="https://i-gate.net.ph/client/public/admin/css/style.css">
+    <link rel="stylesheet" href="https://i-gate.net.ph/client/public/admin/css/dataTables.bootstrap.css">
+    <link rel="stylesheet" href="https://i-gate.net.ph/client/public/admin/css/bootstrap-multiselect.css"
+        type="text/css">
+
+    <meta charset="UTF-8">
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="expires" content="Tue, 01 Jan 1990 12:00:00 GMT">
+    <meta name="insight-app-sec-validation" content="faf8b1d0-9424-4562-8575-906ccaf271dd">
+
+</head>
+
+<body>
+    <!-- container section start -->
+    <section id="container" class="">
+        <!--header start-->
+
+        <header class="header dark-bg">
+
+
+            <!--logo start-->
+            <a
+                href="https://i-gate.net.ph/client/public/dashboard/index/82c50a76a41c3f334ae8ab3a0f71c853m8gPLUmqCO5DhQFKbcq3Xg6tvMJFGb8vOr9Bbfocm7FA82U8jgc03b51221bc3b3339f0a4c0712c532df"><img
+                    src="https://i-gate.net.ph/client/public/admin/img/logo.png" height="55px" class="logo"></a>
+            <!--logo end-->
+
+            <div class="top-nav notification-row">
+                <!-- notificatoin dropdown start-->
+                <ul class="nav pull-right top-menu">
+
+
+                    <!-- user login dropdown start-->
+                    <li class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="username">Welcome! PanasiaticCC0819!</span>
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu extended logout">
+                            <div class="log-arrow-up"></div>
+                            <li class="eborder-top">
+                                <a href="https://i-gate.net.ph/client/public/users/profile/PanasiaticCC0819"><i
+                                        class="fa fa-user"></i> User Profile</a>
+                            </li>
+                            <li>
+                                <a href="https://i-gate.net.ph/client/public/users/logout"><i class="icon_key_alt"></i>
+                                    Log Out</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <!-- user login dropdown end -->
+                </ul>
+                <!-- notificatoin dropdown end-->
+            </div>
+        </header>
+
+        <!--main content start-->
+        <section id="main-content">
+            <section class="wrapper">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3 class="page-header"><i class="fa fa-home"></i> Dashboard
+                            <input type="hidden" name="account_id" id="account_id" value="cl-1369" autocomplete="off">
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12 form-group">
+                        <div class="col-lg-2">
+                            <label class="control-label"><b>Select Service ID:</b></label>
+                        </div>
+                        <div class="col-lg-10">
+                            <span class="multiselect-native-select"><select class="form-control single-dropdown"
+                                    data-live-search="true" data-width="100%" id="interface">
+
+                                    <!-- Plain (non-aggregated) first -->
+                                    <option value="PCCI12-062010-56474" data-id="22445" data-agg="none"
+                                        data-sid="PCCI12-062010-56474">PCCI12-062010-56474</option>
+
+                                    <!-- Soft-aggregated next: plain + tagged -->
+
+                                    <!-- Network-aggregated last: only plain, no tag -->
+
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dates & controls -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-2 form-group">
+                            <label class="control-label"><b>Start Date: </b></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="input-group date form-group" id="datetimepicker6">
+                                <input type="text" placeholder="YYYY-MM-DD HH:mm:ss" id="startdate" class="form-control"
+                                    autocomplete="off">
+                                <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-calendar"></span></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 form-group">
+                            <label class="control-label"><b>End Date: </b></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="input-group date form-group" id="datetimepicker7">
+                                <input type="text" placeholder="YYYY-MM-DD HH:mm:ss" id="enddate" class="form-control"
+                                    autocomplete="off">
+                                <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-calendar"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Units & timeframe -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="col-lg-2 form-group">
+                            <label class="control-label"><b>Units:</b></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <select class="form-control" id="conversiontype">
+                                <option value="bps">bps</option>
+                                <option value="kbps">Kbps</option>
+                                <option value="mbps">Mbps</option>
+                                <option value="gbps">Gbps</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 form-group">
+                            <label class="control-label"><b>Select Time Frame:</b></label>
+                        </div>
+                        <div class="col-lg-4">
+                            <select class="form-control" id="timeframe">
+                                <option selected="" disabled="">Select Time Frame</option>
+                                <option value="1">Last 24 Hours</option>
+                                <option value="2">Last 7 Days</option>
+                                <option value="3">Last 30 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Iframes & panels -->
+                <div class="row">
+                    <div class="col-lg-12 charts">
+                        <iframe name="iframe" id="youriframe" style="height:600px;width:100%;" frameborder="0"
+                            scrolling="no" src="#"></iframe>
+                    </div>
+                    <div class="col-lg-12">
+                        <section class="panel panel-danger">
+                            <header class="panel-heading">Monthly Usage Graph</header>
+                            <div class="panel-body">
+                                <iframe name="iframe" id="youriframe2" style="height:340px;width:100%;" frameborder="0"
+                                    scrolling="no" src="#"></iframe>
+                            </div>
+                        </section>
+                        <section class="panel panel-danger">
+                            <header class="panel-heading">Monthly Usage Table</header>
+                            <div class="panel-body interfacetrends" style="overflow-x:scroll;">
+                                <table class="table table-bordered table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Max Traffic In</th>
+                                            <th>Max Traffic Out</th>
+                                            <th>Monthly Usage</th>
+                                        </tr>
+
+                                        <tr>
+                                            <td>December-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>November-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>October-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>September-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>August-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>July-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>June-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>May-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>April-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>March-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>February-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>January-2025</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+
+
+                                        <!--                                   <tr>
+                                  <td>Feb-2016</td>
+                                  <td>10000</td>
+                                  <td>20000</td>
+                                  <td>120000</td>
+                                  </tr>
+                                  <tr>
+                                  <td>Mar-2016</td>
+                                  <td>10000</td>
+                                  <td>20000</td>
+                                  <td>120000</td>
+                                  </tr>
+                                  <tr>
+                                  <td>Apr-2016</td>
+                                  <td>10000</td>
+                                  <td>20000</td>
+                                  <td>120000</td>
+                                  </tr>
+                                  <tr>
+                                  <td>May-2016</td>
+                                  <td>10000</td>
+                                  <td>20000</td>
+                                  <td>120000</td>
+                                  </tr>
+                                  <tr>
+                                  <td>Jun-2016</td>
+                                  <td>10000</td>
+                                  <td>20000</td>
+                                  <td>120000</td>
+                                  </tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- javascripts -->
+        <script src="https://i-gate.net.ph/client/public/admin/js/jquery-3.5.1.min.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/bootstrap-3.4.min.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/bootstrap-multiselect.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/main.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/chart.js"></script>
+
+
+        <script>
+            window.paceOptions = {
+                ajax: {
+                    trackMethods: ['GET', 'POST', 'PUT', 'DELETE', 'REMOVE']
+                }
+            };
+
+            $(document).ready(function () { $("input").attr("autocomplete", "off"); }); 
+        </script>
+
+
+
+        <script src="https://i-gate.net.ph/client/public/admin/js/pnotify.custom.min.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/moment.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/bootstrap-datetimepicker.min.js"></script>
+        <!-- DataTables -->
+        <script src="https://i-gate.net.ph/client/public/admin/js/jquery.dataTables.min.js"></script>
+        <script src="https://i-gate.net.ph/client/public/admin/js/dataTables.bootstrap.min.js"></script>
+
+    </section>
+    <div style="position: fixed; z-index: 2147483647; left: 0px; top: 0px; pointer-events: none;"
+        id="dark-mode-2DwclLsw"></div>
+</body>
+
+</html>
