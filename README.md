@@ -63,19 +63,6 @@ A **Windows Application** that consolidates multiple ISP bandwidth monitoring po
 
 ---
 
-## 🖼 Screenshots
-
-Place screenshots inside a `screenshots/` folder:
-
-```
-screenshots/
-├── dashboard.png
-├── all-bandwidth.png
-└── update-progress.png
-```
-
----
-
 ## 🏗 Build
 
 ```bash
