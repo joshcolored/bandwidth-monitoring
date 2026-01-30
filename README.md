@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![License](https://img.shields.io/badge/License-Proprietary-red)
 
-A **Windows desktop Electron application** that consolidates multiple ISP bandwidth monitoring portals into **one unified, always-on dashboard**, designed for IT, NOC, and internal monitoring environments.
+A **Windows Application** that consolidates multiple ISP bandwidth monitoring portals into **one unified, always-on dashboard**, designed for IT, NOC, and internal monitoring environments.
 
 ---
 
