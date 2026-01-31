@@ -115,5 +115,6 @@ Example:
 
 ## 📄 License
 
+MIT © 2026 Joshua Grijaldo
 Proprietary / Internal Use Only  
 All rights reserved.
