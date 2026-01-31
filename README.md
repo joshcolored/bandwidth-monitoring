@@ -4,7 +4,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)
 ![Version](https://img.shields.io/badge/Version-1.2.8-blue)
 ![Status](https://img.shields.io/badge/Status-Active-success)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
 A **Windows Application** that consolidates multiple ISP bandwidth monitoring portals into **one unified, always-on dashboard**, designed for IT, NOC, and internal monitoring environments.
 
